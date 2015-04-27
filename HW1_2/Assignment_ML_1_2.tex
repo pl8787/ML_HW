@@ -5,33 +5,214 @@
 \usepackage[colorlinks]{hyperref}
 \usepackage{geometry}
 \usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{float}
+
 \geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
 
-\title{Machine Learning - HW1 & 2}
+\title{Machine Learning - HW1 \& 2}
 \author{Pang Liang\\ Student No. 201418013229033}
 
 \begin{document}
 \maketitle
 
+%    \begin{table}[!hbp]
+%      \centering
+%      \begin{tabular}{|c|c||c|c|}
+%        \hline
+%        $x_1$ & $x_2$ & $p(c=0|x_1, x_2)$ & $p(c=1|x_1, x_2)$ \\
+%        \hline
+%       0 & 0 & 0.25 & 0.75 \\
+%       \hline
+%        0 & 1 & 0.25 & 0.75 \\
+%        \hline
+%        1 & 0 & 1. & 0. \\
+%        \hline
+%        1 & 1 & 0.6 & 0.4 \\
+%        \hline
+%      \end{tabular}
+
+%      \caption{Values of $p(y | x_1, x_2)$.} \label{table1}
+%    \end{table}
+
 \section{Problem1 - Bayes Classifier}
 
+    \begin{table}[!hbp]
+      \centering
+      \begin{tabular}{|c|c|c||c|}
+        \hline
+        $x_1$ & $x_2$ & $y$ & $p(y, x_1, x_2)$ \\
+        \hline
+        0 & 0 & 0 & 0.0625 \\
+        \hline
+        0 & 0 & 1 & 0.1875 \\
+        \hline
+        0 & 1 & 0 & 0.0625 \\
+        \hline
+        0 & 1 & 1 & 0.1875 \\
+        \hline
+        1 & 0 & 0 & 0.1875 \\
+        \hline
+        1 & 0 & 1 & 0.0 \\
+        \hline
+        1 & 1 & 0 & 0.1875 \\
+        \hline
+        1 & 1 & 1 & 0.125 \\
+        \hline
+      \end{tabular}
 
-\section{Problem2 - Gaussian Bayes Classifiers}
+      \caption{Values of $p(y , x_1, x_2)$.} \label{table1}
+    \end{table}
+
 \begin{enumerate}
-    \item Plot the iris data X in 2-D space;
+    \item Joint Bayes Classifier
+    The joint distribution over all feature is that 
+    \begin{equation}
+    p(y|x_1, x_2) =  \frac{p(y,x_1,x_2)}{p(x_2|x_1) * p(x_1)}
+    \end{equation}
+    So we need estimate these probabilities given the train data. The $p(y, x_1, x_2)$ shows in \ref{table1}.
+
+    \begin{table}[!hbp]
+      \centering
+      \begin{tabular}{|c||c|c|}
+        \hline
+        $x_1$ & $p(x_2=0 | x_1)$ & $p(x_2=1 | x_1)$ \\
+        \hline
+        0 & 0.5 & 0.5 \\
+        \hline
+        1 & 0.375 & 0.625 \\
+        \hline
+      \end{tabular}
+
+      \caption{Values of $p(x_2 | x_1)$.}\label{table2}
+    \end{table}
+
+    \begin{equation}
+    p(x_1 = 0) = 0.5 , p(x_1 = 1) = 0.5
+    \end{equation}
+
+    Then we predict the test data below:
+    \begin{equation}
+        \begin{split}
+            p(y = 1|x_1 = 0, x_2 = 1) &= \frac{p(y = 1,x_1 = 0,x_2 = 1)}{p(x_2 = 1|x_1 = 0) * p(x_1 = 0)}\\
+            &= 0.1875/0.5/0.5 = 0.75
+        \end{split}
+    \end{equation}
+
+    \begin{equation}
+        \begin{split}
+            p(y = 1|x_1 = 1, x_2 = 0) &=  \frac{p(y = 1,x_1 = 1,x_2 = 0)}{p(x_2 = 0|x_1 = 1) * p(x_1 = 1)}\\
+            &= 0
+        \end{split}
+    \end{equation}
+
+    \begin{equation}
+        \begin{split}
+            p(y = 0|x_1 = 1, x_2 = 1) &=  \frac{p(y = 0,x_1 = 1,x_2 = 1)}{p(x_2 = 1|x_1 = 1) * p(x_1 = 1)}\\
+            &= 0.1875/0.625/0.5 = 0.6
+        \end{split}
+    \end{equation}
     
-    \item Plot each of Gaussian Kernels on top of the data
     
-    \item Using Gaussian Bayes Classify (with free covariances)
+    \item Naive Bayes Classifier
+    For Naive Bayes we assume that $p(x_2|x_1) = p(x_2)$. So
+    \begin{equation}
+    p(y|x_1, x_2) =  \frac{p(y,x_1,x_2)}{p(x_1) * p(x_2)}
+    \end{equation}
     
-    \item Using Gaussian Bayes Classify (with equal covariances)
+    Then we only need $p(x_1)$ and $p(x_2)$ below:
     
-    \item Poly Classify ($p = 2,3,4$)
+    \begin{equation}
+    p(x_1 = 0) = 0.5 , p(x_1 = 1) = 0.5
+    \end{equation}
+    
+    \begin{equation}
+    p(x_2 = 0) = 0.4375 , p(x_2 = 1) = 0.5625
+    \end{equation}
+    
+    Then we predict the test data below:
+    \begin{equation}
+        \begin{split}
+            p(y = 1|x_1 = 0, x_2 = 1) &= \frac{p(y = 1,x_1 = 0,x_2 = 1)}{p(x_2 = 1) * p(x_1 = 0)}\\
+            &= 0.1875/0.5625/0.5 = 0.67
+        \end{split}
+    \end{equation}
+
+    \begin{equation}
+        \begin{split}
+            p(y = 1|x_1 = 1, x_2 = 0) &=  \frac{p(y = 1,x_1 = 1,x_2 = 0)}{p(x_2 = 0) * p(x_1 = 1)}\\
+            &= 0
+        \end{split}
+    \end{equation}
+
+    \begin{equation}
+        \begin{split}
+            p(y = 0|x_1 = 1, x_2 = 1) &=  \frac{p(y = 0,x_1 = 1,x_2 = 1)}{p(x_2 = 1) * p(x_1 = 1)}\\
+            &= 0.1875/0.5625/0.5 = 0.67
+        \end{split}
+    \end{equation}
+      
     
 \end{enumerate}
 
 
-\section{Problem3}
+\section{Problem2 - Gaussian Bayes Classifiers}
+\begin{enumerate}
+    \item Plot the iris data X in 2-D space
+    
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=8cm]{fig/2-0.jpg}\\
+      \caption{Data distribution}\label{fig1}
+    \end{figure}
+    
+    \item Plot each of Gaussian Kernels on top of the data
+    
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=8cm]{fig/2-1.jpg}\\
+      \caption{Estimated Gaussian Kernels}\label{fig1}
+    \end{figure}
+
+    \item Using Gaussian Bayes Classify (with free covariances)
+    
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=8cm]{fig/2-2.jpg}\\
+      \caption{Class Boundary}\label{fig1}
+    \end{figure}
+
+    \item Using Gaussian Bayes Classify (with equal covariances)
+    
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=8cm]{fig/2-3.jpg}\\
+      \caption{Class Boundary}\label{fig1}
+    \end{figure}
+
+    \item Poly Classify ($p = 2,3,4$)
+    
+    \begin{figure}[H]
+        \centering
+        \subfigure[$p=2$]{
+            \label{Fig.sub.1}
+            \includegraphics[width=0.3\textwidth]{fig/2-4-2.jpg}}
+        \subfigure[$p=3$]{
+            \label{Fig.sub.2}
+            \includegraphics[width=0.3\textwidth]{fig/2-4-3.jpg}}
+        \subfigure[$p=4$]{
+            \label{Fig.sub.3}
+            \includegraphics[width=0.3\textwidth]{fig/2-4-4.jpg}}
+        \caption{Different Poly Level, Draw Class Boundary}
+        \label{Fig.lable}
+    \end{figure}
+
+\end{enumerate}
+
+
+\section{Problem3 - SVM}
 
 
 \section{Problem4 - Run SVMs}

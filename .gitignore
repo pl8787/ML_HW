@@ -1,3 +1,10 @@
 *.zip
 *.rar
 *.bak
+
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex
