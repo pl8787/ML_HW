@@ -31,12 +31,12 @@ for c = -1 : 1 : 6
 end
 
 % Draw grid map
-[X, Y] = meshgrid(-1 : 1 : 6, 0 : -1 : -8);
+[X, Y] = meshgrid(0 : -1 : -8, -1 : 1 : 6);
 Z = reshape(Z, size(X));
 surf(X, Y, Z);
 
 %% Best Model
-param = sprintf('-c %f -g %f', 2.0^3, 2.0^(-7));
+param = sprintf('-c %f -g %f', 2.0^4, 2.0^(-7));
 best_svm = svmtrain(train_label, train_data, param);
 [best_result, best_acc, best_prob] = svmpredict(test_label, test_data, best_svm);
 
