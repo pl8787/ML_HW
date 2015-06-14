@@ -18,38 +18,206 @@
 \begin{document}
 \maketitle
 
-%    \begin{table}[!hbp]
-%      \centering
-%      \begin{tabular}{|c|c||c|c|}
-%        \hline
-%        $x_1$ & $x_2$ & $p(c=0|x_1, x_2)$ & $p(c=1|x_1, x_2)$ \\
-%        \hline
-%       0 & 0 & 0.25 & 0.75 \\
-%       \hline
-%        0 & 1 & 0.25 & 0.75 \\
-%        \hline
-%        1 & 0 & 1. & 0. \\
-%        \hline
-%        1 & 1 & 0.6 & 0.4 \\
-%        \hline
-%      \end{tabular}
-
-%      \caption{Values of $p(y | x_1, x_2)$.} \label{table1}
-%    \end{table}
-
 \section{Problem1 - Hard margin SVM}
-
+For a Maximum Margin Problem, we need solve problem as: 
+\begin{equation}
+	\begin{split}
+		&\arg{\min}_{w,b} \frac{1}{2} \|w\|^2 \\
+		s.t.\ &t_n(w^T \phi(x_n) + b) \geq 1,\ n=1, 2 \dots N
+	\end{split}
+\end{equation}
+In this question, we set $\phi$ to an identity function, and we rewrite this formula directly for this question.
+\begin{equation}
+	\begin{split}
+		&\arg{\min}_{w,b} \frac{1}{2} \|w\|^2 \\
+		s.t.\ &w^T x^{(1)}+b \geq 1 \\
+		      &-w^T x^{(2)}-b \geq 1 
+	\end{split}
+\end{equation}
+Using Lagrange multipliers $a_n \geq 0$,
+\begin{equation}
+	L(w,b,a) = \frac{1}{2}\|w\|^2 - a_1(w^Tx^{(1)}+b-1) - a_2(-w^Tx^{(2)}-b-1)
+\end{equation}
+respect to $w$ and $b$ we get
+\begin{equation}
+	\begin{split}
+		w &= a_1 x^{(1)} - a_2 x^{(2)} \\
+		0 &= a_1 - a_2
+	\end{split}
+\end{equation}
+So we set $a = a_1 = a_2$ and eliminate $w$ and $b$,
+\begin{equation}
+	L(a) = 2a - \frac{1}{2} a^2 (x^{(1)} - x^{(2)})^T (x^{(1)} - x^{(2)})
+\end{equation}
+respect to $a$ we get
+\begin{equation}
+	\begin{split}
+	a &= \frac{2}{(x^{(1)} - x^{(2)})^T (x^{(1)} - x^{(2)})}\\	
+	w &= \frac{2}{(x^{(1)} - x^{(2)})^T (x^{(1)} - x^{(2)})} (x^{(1)} - x^{(2)})
+	\end{split}
+\end{equation}
 
 \section{Problem2 - P3.11 in Bishop's book}
-
+3.59 shows that
+\begin{equation}
+	\begin{split}
+	\sigma_{N+1}^2(x) &= \frac{1}{\beta} + \phi(x)^T S_{N+1} \phi(x)\\
+	S_{N+1}^{-1} &= S_N^{-1} + \beta \phi_{N+1} \phi_{N+1}^T\\
+	\end{split}
+\end{equation}
+Then we get
+\begin{equation}
+	\begin{split}
+		S_{N+1} &= (S_N^{-1} + \beta \phi_{N+1} \phi_{N+1}^T)^{-1}\\
+		&= S_N - \frac{\beta S_N \phi_N \phi_N^T S_N}{1+\beta \phi_N^T S_N \phi_N}\\
+	\end{split}
+\end{equation}
+Then we can rewrite (7)
+\begin{equation}
+	\begin{split}
+		\sigma_{N+1}^2(x) &= \sigma_N^2 - \frac{\beta \phi(x)^T S_N \phi_N \phi_N^T S_N \phi(x)}{1+\beta \phi_N^T S_N \phi_N}\\
+		&\leq \sigma_N^2
+	\end{split}
+\end{equation}
 
 \section{Problem3 - P5.28 in Bishop's book}
+For a convolutional layer:
 
+\textbf{Forward Step} is define below:
+\begin{equation}
+	z_{i,j} = \sum_{k_1=0}^{K_1} \sum_{k_2=0}^{K_2} w_{k_1, k_2} \cdot a_{i+k_1, j+k_2} + b
+\end{equation}
+We can convert it to fully matrix operation after we introduce a expand matrix $M$,
+\begin{equation}
+	\begin{split}
+		M_{i,j} &= a_{i_1+j_1,i_2+j_2}\\
+		i_1 = i / N,&\ i_2 = i \mod N\\
+		j_1 = j / K,&\ j_2 = j \mod K\\
+		i = 0, 1, \cdots, MN-1&\ j = 0, 1, \cdots, K-1
+	\end{split}
+\end{equation}
+Then flatten kernel matrix $W$ to $W[:]$, so convolution operation rewrite below:
+\begin{equation}
+	Z = MW[:] + b
+\end{equation}
+
+\textbf{Backprop Step} split to two mini-steps:
+
+	$E^{(l+1)}$ denotes the $l+1$ layer loss back propagation to lower layer.
+	
+	\textbf{Calculate Error}
+	\begin{equation}
+		E^{(l)} = E^{(l+1)} \cdot W[:]^T
+	\end{equation}
+
+	\textbf{Calculate Gradient}
+	\begin{equation}
+		dW[:] = M \cdot E^{(l)}
+	\end{equation}
 
 \section{Problem4 - P6.11 in Bishop's book}
+Gaussian kernel:
+\begin{equation}
+	k(x,x') = \exp(-\|x-x'\|^2/2\sigma^2)
+\end{equation}
+As the 6.26 shows, we can rewrite it to
+\begin{equation}
+	k(x,x') = \exp(-x^T x/2\sigma^2) \exp(x^T x'/\sigma^2) \exp(-x'^T x'/2\sigma^2)
+\end{equation}
+And an exp kernel function can decompose to the sum of infinite polynomial kernel
+\begin{equation}
+	exp(k(x,x')) = \sum_{m=0}^{\infty} \frac{k(x,x')^m}{m!}
+\end{equation}
+So we set
+\begin{equation}
+	\phi_m(x) = \exp(-x^Tx/2\sigma^2) \frac{x^m}{\sigma \sqrt{m!}}
+\end{equation}
+Gaussian kernel can be expressed as the inner product of an infinite-dimensional feature vector:
+\begin{equation}
+	\begin{split}
+		k(x,x') &= \Phi(x)\Phi(x')\\
+		\Phi(x) &= [\phi_0(x), \phi_1(x), \cdots ]
+	\end{split}
+\end{equation}
 
 
 \section{Problem5 - Hidden Markov Models}
+According to the description in problem, we have:
+\begin{equation}
+	P(X_1 = Happy)=1
+\end{equation}
+\begin{enumerate}
+	\item
+	\begin{equation}
+		\begin{split}
+			P(X_2=Happy) &= P(X_2=Happy | X_1=Happy)*P(X_1=Happy)\\
+			&+P(X_2=Happy | X_1=Angry)*P(X_1=Angry) \\
+			& = 0.9* 1.0 = 0.9
+		\end{split}
+	\end{equation}
+	\item
+	\begin{equation}
+		\begin{split}
+			P(Y_2=frown) &= \sum_{X_2} P(Y_2=frown | X_2) P(X_2|X_1=Happy) P(X_1=Happy)\\
+			&=0.1*0.9 + 0.6*0.1 = 0.15
+		\end{split}
+	\end{equation}
+	\item
+	\begin{equation}
+		\begin{split}
+			P(X_2=Happy | Y_2=frown) &= \frac{P(Y_2=frown|X_2=Happy)*P(X_2=Happy)}{P(Y_2=frown)}\\
+			&=0.1*0.9/0.15 = 0.6
+		\end{split}
+	\end{equation}
+	\item
+	The transfer matrix is 
+	\begin{equation}
+		A = \left [ \begin{array}{cc}
+			0.9 & 0.1 \\
+			0.1 & 0.9 
+		\end{array} \right ].
+	\end{equation}
+	And we assume that the stationary distribution is 
+	\begin{equation}
+		A^* = \left [ \begin{array}{cc}
+			a & b \\
+			b & a 
+		\end{array} \right ].
+	\end{equation}
+	We have 
+	\begin{equation}
+		A^* A = A^*
+	\end{equation}
+	So $a=b=0.5$.
+	\begin{equation}
+		\begin{split}
+			P(Y_{80}=yell) &= \sum_{X_{80}}P(Y_{80}=yell|X_{80})P(X_{80})\\
+			&= \sum_{X_{80}}P(Y_{80}=yell|X_{80}) A^* P(X_1)\\
+			&= 0.1*0.5+0.2*0.5 = 0.15
+		\end{split}
+	\end{equation}
+	\item
+	\begin{equation}
+		\begin{split}
+			&\arg \max_{x_1\dots x_5} P(X_1=x_1,\cdots,X_5=x_5|Y_1=Y_2=\cdots =Y_5=frown)\\
+			=&\arg \max_{x_1\cdots x_5}\frac{P(Y_1=Y_2=\cdots=Y_5=frown|X_1=x_1\cdots X_5=x_5)P(X_1=x_1\cdots X_5=x_5)}{P(Y_1=Y_2=\cdots =Y_5)}\\
+			=&\arg \max_{x_1\cdots x_5} P(Y_1=frown|X_1=x_1)\cdots P(Y_5=frown|X_5=x_5) P(X_1) P(X_2|X_1)\cdots P(X_5|X_4)\\
+		\end{split}
+	\end{equation}
+	\begin{table}[!htbp]
+		\begin{tabular}{c|c|c|c|c|c}
+			\hline
+			state of previous & $x_5$ & $x_4$ & $x_3$ & $x_2$ & $x_1$\\
+			\hline
+			Happy & \textbf{Happy}(0.09) & \textbf{Happy}(0.09) & \textbf{Happy}(0.09) & \textbf{Happy}(0.09)& \textbf{Happy}(1)\\
+			\hline
+			Angry & Angry(0.54) & Angry(0.54) &Angry(0.54) &Angry(0.54) &Angry(0)\\
+			\hline
+		\end{tabular}
+	\end{table}
+	
+	Because $P(X_1=Happy)=1$, so $x_1 = x_2 = \cdots = x_5 = Happy$.
+\end{enumerate}
 
 
 \end{document}
